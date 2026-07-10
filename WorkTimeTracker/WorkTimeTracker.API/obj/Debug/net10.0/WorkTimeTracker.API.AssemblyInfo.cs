@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WorkTimeTracker.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+92040a61f6a44921ac64e708e7a8718f6c2c59d0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7b45a349f2ff43c655e9bdefcab437de381a6b61")]
 [assembly: System.Reflection.AssemblyProductAttribute("WorkTimeTracker.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WorkTimeTracker.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
