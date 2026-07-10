@@ -1,0 +1,742 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WorkTimeTracker.API</name>
+    </assembly>
+    <members>
+        <member name="T:WorkTimeTracker.API.Controllers.ProjectsController">
+            <summary>
+            Контроллер для управления проектами
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.ProjectsController.GetAll">
+            <summary>
+            Получить список всех проектов
+            </summary>
+            <remarks>
+            Возвращает все проекты компании, включая неактивные.
+            </remarks>
+            <response code="200">Успешное получение списка проектов</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.ProjectsController.GetById(System.Guid)">
+            <summary>
+            Получить проект по идентификатору
+            </summary>
+            <param name="id">Идентификатор проекта (UUID)</param>
+            <response code="200">Проект найден</response>
+            <response code="404">Проект не найден</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.ProjectsController.Create(WorkTimeTracker.API.DTOs.Project.ProjectRequestDto)">
+            <summary>
+            Создать новый проект
+            </summary>
+            <param name="dto">Данные для создания проекта</param>
+            <remarks>
+            Пример запроса:
+            
+                POST /api/projects
+                {
+                    "name": "Разработка мобильного приложения",
+                    "code": "MOB-2026",
+                    "isActive": true
+                }
+            </remarks>
+            <response code="201">Проект успешно создан</response>
+            <response code="400">Некорректные данные или код уже существует</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.ProjectsController.Update(System.Guid,WorkTimeTracker.API.DTOs.Project.ProjectRequestDto)">
+            <summary>
+            Обновить проект
+            </summary>
+            <param name="id">Идентификатор проекта (UUID)</param>
+            <param name="dto">Обновленные данные проекта</param>
+            <remarks>
+            Пример запроса:
+            
+                PUT /api/projects/{id}
+                {
+                    "name": "Разработка мобильного приложения v2",
+                    "code": "MOB-2026-V2",
+                    "isActive": true
+                }
+            </remarks>
+            <response code="200">Проект успешно обновлен</response>
+            <response code="400">Некорректные данные или код уже существует</response>
+            <response code="404">Проект не найден</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.ProjectsController.Delete(System.Guid)">
+            <summary>
+            Удалить проект
+            </summary>
+            <param name="id">Идентификатор проекта (UUID)</param>
+            <remarks>
+            Проект можно удалить только если у него нет активных задач.
+            </remarks>
+            <response code="204">Проект успешно удален</response>
+            <response code="400">Невозможно удалить проект с активными задачами</response>
+            <response code="404">Проект не найден</response>
+        </member>
+        <member name="T:WorkTimeTracker.API.Controllers.TasksController">
+            <summary>
+            Контроллер для управления задачами
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TasksController.GetAll">
+            <summary>
+            Получить список всех задач
+            </summary>
+            <remarks>
+            Возвращает все задачи компании, включая неактивные, с информацией о проектах.
+            </remarks>
+            <response code="200">Успешное получение списка задач</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TasksController.GetById(System.Guid)">
+            <summary>
+            Получить задачу по идентификатору
+            </summary>
+            <param name="id">Идентификатор задачи (UUID)</param>
+            <response code="200">Задача найдена</response>
+            <response code="404">Задача не найдена</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TasksController.GetByProject(System.Guid)">
+            <summary>
+            Получить задачи по проекту
+            </summary>
+            <param name="projectId">Идентификатор проекта (UUID)</param>
+            <response code="200">Успешное получение списка задач</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TasksController.GetActive">
+            <summary>
+            Получить только активные задачи
+            </summary>
+            <remarks>
+            Возвращает задачи, которые активны и принадлежат активным проектам.
+            Используется для выбора задач при создании проводок.
+            </remarks>
+            <response code="200">Успешное получение списка активных задач</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TasksController.Create(WorkTimeTracker.API.DTOs.Task.TaskRequestDto)">
+            <summary>
+            Создать новую задачу
+            </summary>
+            <param name="dto">Данные для создания задачи</param>
+            <remarks>
+            Пример запроса:
+            
+                POST /api/tasks
+                {
+                    "name": "Разработка API для учета времени",
+                    "projectId": "123e4567-e89b-12d3-a456-426614174000",
+                    "isActive": true
+                }
+            </remarks>
+            <response code="201">Задача успешно создана</response>
+            <response code="400">Некорректные данные или задача уже существует</response>
+            <response code="404">Проект не найден</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TasksController.Update(System.Guid,WorkTimeTracker.API.DTOs.Task.TaskRequestDto)">
+            <summary>
+            Обновить задачу
+            </summary>
+            <param name="id">Идентификатор задачи (UUID)</param>
+            <param name="dto">Обновленные данные задачи</param>
+            <remarks>
+            Пример запроса:
+            
+                PUT /api/tasks/{id}
+                {
+                    "name": "Разработка API для учета времени v2",
+                    "projectId": "123e4567-e89b-12d3-a456-426614174000",
+                    "isActive": false
+                }
+            </remarks>
+            <response code="200">Задача успешно обновлена</response>
+            <response code="400">Некорректные данные или задача уже существует</response>
+            <response code="404">Задача не найдена</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TasksController.Delete(System.Guid)">
+            <summary>
+            Удалить задачу
+            </summary>
+            <param name="id">Идентификатор задачи (UUID)</param>
+            <remarks>
+            Задачу можно удалить только если на нее нет проводок времени.
+            </remarks>
+            <response code="204">Задача успешно удалена</response>
+            <response code="400">Невозможно удалить задачу с проводками времени</response>
+            <response code="404">Задача не найдена</response>
+        </member>
+        <member name="T:WorkTimeTracker.API.Controllers.TimeEntriesController">
+            <summary>
+            Контроллер для управления проводками рабочего времени
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TimeEntriesController.GetAll(System.Nullable{System.DateTime},System.String,System.String)">
+            <summary>
+            Получить все проводки с фильтрацией
+            </summary>
+            <param name="date">Фильтр по конкретной дате (YYYY-MM-DD)</param>
+            <param name="month">Фильтр по месяцу (YYYY-MM)</param>
+            <param name="week">Фильтр по неделе (YYYY-WW)</param>
+            <remarks>
+            Примеры фильтрации:
+            
+                GET /api/timeentries?date=2026-07-08
+                GET /api/timeentries?month=2026-07
+                GET /api/timeentries?week=2026-28
+            </remarks>
+            <response code="200">Успешное получение списка проводок</response>
+            <response code="400">Неверный формат фильтра</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TimeEntriesController.GetById(System.Guid)">
+            <summary>
+            Получить проводку по идентификатору
+            </summary>
+            <param name="id">Идентификатор проводки (UUID)</param>
+            <response code="200">Проводка найдена</response>
+            <response code="404">Проводка не найдена</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TimeEntriesController.Create(WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryRequestDto)">
+            <summary>
+            Создать новую проводку времени
+            </summary>
+            <param name="dto">Данные для создания проводки</param>
+            <remarks>
+            Пример запроса:
+            
+                POST /api/timeentries
+                {
+                    "date": "2026-07-08",
+                    "hours": 4.5,
+                    "description": "Разработка API для учета времени",
+                    "taskId": "123e4567-e89b-12d3-a456-426614174000"
+                }
+            
+            Ограничения:
+            - Часы должны быть от 0.01 до 24
+            - Сумма часов за день не может превышать 24
+            - Задача должна быть активной
+            </remarks>
+            <response code="201">Проводка успешно создана</response>
+            <response code="400">Некорректные данные или превышен лимит часов</response>
+            <response code="404">Задача не найдена</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TimeEntriesController.Update(System.Guid,WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryUpdateDto)">
+            <summary>
+            Обновить проводку
+            </summary>
+            <param name="id">Идентификатор проводки (UUID)</param>
+            <param name="dto">Обновленные данные проводки</param>
+            <remarks>
+            Пример запроса:
+            
+                PUT /api/timeentries/{id}
+                {
+                    "date": "2026-07-08",
+                    "hours": 5.0,
+                    "description": "Обновленное описание работы"
+                }
+            
+            Примечание: Поле TaskId нельзя изменить через этот метод.
+            Для смены задачи используйте PATCH /api/timeentries/{id}/task
+            </remarks>
+            <response code="200">Проводка успешно обновлена</response>
+            <response code="400">Некорректные данные или превышен лимит часов</response>
+            <response code="404">Проводка не найдена</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TimeEntriesController.ChangeTask(System.Guid,WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryChangeTaskDto)">
+            <summary>
+            Сменить задачу у проводки
+            </summary>
+            <param name="id">Идентификатор проводки (UUID)</param>
+            <param name="dto">Данные с новой задачей</param>
+            <remarks>
+            Пример запроса:
+            
+                PATCH /api/timeentries/{id}/task
+                {
+                    "taskId": "123e4567-e89b-12d3-a456-426614174001"
+                }
+            
+            Ограничения:
+            - Текущая задача должна быть активной
+            - Новая задача должна быть активной
+            - Новая задача должна принадлежать активному проекту
+            </remarks>
+            <response code="200">Задача успешно изменена</response>
+            <response code="400">Некорректные данные или задача неактивна</response>
+            <response code="404">Проводка или задача не найдены</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TimeEntriesController.Delete(System.Guid)">
+            <summary>
+            Удалить проводку
+            </summary>
+            <param name="id">Идентификатор проводки (UUID)</param>
+            <response code="204">Проводка успешно удалена</response>
+            <response code="404">Проводка не найдена</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TimeEntriesController.GetDailySummary(System.DateTime)">
+            <summary>
+            Получить дневную сводку для визуализации стикеров
+            </summary>
+            <param name="date">Дата для сводки (YYYY-MM-DD)</param>
+            <remarks>
+            Возвращает статус рабочего дня:
+            - Желтый стикер: менее 8 часов
+            - Зеленый стикер: ровно 8 часов
+            - Красный стикер: более 8 часов
+            </remarks>
+            <response code="200">Успешное получение сводки</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TimeEntriesController.GetMonthlySummary(System.Int32,System.Int32)">
+            <summary>
+            Получить месячную сводку
+            </summary>
+            <param name="year">Год (например: 2026)</param>
+            <param name="month">Месяц (от 1 до 12)</param>
+            <remarks>
+            Возвращает детальную сводку по каждому дню месяца с указанием статуса.
+            </remarks>
+            <response code="200">Успешное получение сводки</response>
+            <response code="400">Неверный год или месяц</response>
+        </member>
+        <member name="M:WorkTimeTracker.API.Controllers.TimeEntriesController.TryParseWeek(System.String,System.DateTime@,System.DateTime@)">
+            <summary>
+            Разобрать строку недели в даты начала и конца
+            </summary>
+            <param name="weekString">Строка в формате YYYY-WW</param>
+            <param name="startOfWeek">Дата начала недели (понедельник)</param>
+            <param name="endOfWeek">Дата конца недели (воскресенье)</param>
+            <returns>True если парсинг успешен</returns>
+        </member>
+        <member name="T:WorkTimeTracker.API.DTOs.Project.ProjectRequestDto">
+            <summary>
+            DTO для создания/обновления проекта
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Project.ProjectRequestDto.Name">
+            <summary>
+            Название проекта
+            </summary>
+            <example>Разработка мобильного приложения</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Project.ProjectRequestDto.Code">
+            <summary>
+            Код проекта
+            </summary>
+            <example>MOB-2026</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Project.ProjectRequestDto.IsActive">
+            <summary>
+            Активен ли проект
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="T:WorkTimeTracker.API.DTOs.Project.ProjectResponseDto">
+            <summary>
+            DTO для отображения проекта
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Project.ProjectResponseDto.Id">
+            <summary>
+            Идентификатор проекта
+            </summary>
+            <example>123e4567-e89b-12d3-a456-426614174000</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Project.ProjectResponseDto.Name">
+            <summary>
+            Название проекта
+            </summary>
+            <example>Разработка мобильного приложения</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Project.ProjectResponseDto.Code">
+            <summary>
+            Код проекта
+            </summary>
+            <example>MOB-2026</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Project.ProjectResponseDto.IsActive">
+            <summary>
+            Активен ли проект
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Project.ProjectResponseDto.CreatedAt">
+            <summary>
+            Дата создания
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Project.ProjectResponseDto.UpdatedAt">
+            <summary>
+            Дата последнего обновления
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.DTOs.Reports.DailySummaryDto">
+            <summary>
+            DTO для дневной сводки (для визуализации стикеров)
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Reports.DailySummaryDto.Date">
+            <summary>
+            Дата
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Reports.DailySummaryDto.TotalHours">
+            <summary>
+            Общее количество часов за день
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Reports.DailySummaryDto.Status">
+            <summary>
+            Статус: "under" - меньше 8ч, "exact" - ровно 8ч, "over" - больше 8ч
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Reports.DailySummaryDto.StatusMessage">
+            <summary>
+            Текстовое описание статуса
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Reports.DailySummaryDto.Color">
+            <summary>
+            Цвет стикера: "yellow", "green", "red"
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.DTOs.Reports.MonthlySummaryDto">
+            <summary>
+            DTO для месячной сводки
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Reports.MonthlySummaryDto.Year">
+            <summary>
+            Год
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Reports.MonthlySummaryDto.Month">
+            <summary>
+            Месяц
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Reports.MonthlySummaryDto.Days">
+            <summary>
+            Список дней с детализацией
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Reports.MonthlySummaryDto.MonthTotalHours">
+            <summary>
+            Общее количество часов за месяц
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.DTOs.Task.TaskRequestDto">
+            <summary>
+            DTO для создания/обновления задачи
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Task.TaskRequestDto.Name">
+            <summary>
+            Название задачи
+            </summary>
+            <example>Разработка API для учета времени</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Task.TaskRequestDto.ProjectId">
+            <summary>
+            Идентификатор проекта
+            </summary>
+            <example>123e4567-e89b-12d3-a456-426614174000</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Task.TaskRequestDto.IsActive">
+            <summary>
+            Активна ли задача
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="T:WorkTimeTracker.API.DTOs.Task.TaskResponseDto">
+            <summary>
+            DTO для отображения задачи
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Task.TaskResponseDto.Id">
+            <summary>
+            Идентификатор задачи
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Task.TaskResponseDto.Name">
+            <summary>
+            Название задачи
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Task.TaskResponseDto.ProjectId">
+            <summary>
+            Идентификатор проекта
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Task.TaskResponseDto.ProjectName">
+            <summary>
+            Название проекта
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Task.TaskResponseDto.ProjectCode">
+            <summary>
+            Код проекта
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Task.TaskResponseDto.IsActive">
+            <summary>
+            Активна ли задача
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Task.TaskResponseDto.CreatedAt">
+            <summary>
+            Дата создания
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.Task.TaskResponseDto.UpdatedAt">
+            <summary>
+            Дата последнего обновления
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryChangeTaskDto">
+            <summary>
+            DTO для смены задачи в проводке
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryChangeTaskDto.TaskId">
+            <summary>
+            Новый идентификатор задачи
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryRequestDto">
+            <summary>
+            DTO для создания новой проводки времени
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryRequestDto.Date">
+            <summary>
+            Дата списания времени (только дата, без времени)
+            </summary>
+            <example>2026-07-10</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryRequestDto.Hours">
+            <summary>
+            Количество затраченных часов (от 0.01 до 24)
+            </summary>
+            <example>4.5</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryRequestDto.Description">
+            <summary>
+            Описание выполненной работы
+            </summary>
+            <example>Разработка API для учета времени</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryRequestDto.TaskId">
+            <summary>
+            Идентификатор задачи
+            </summary>
+            <example>123e4567-e89b-12d3-a456-426614174000</example>
+        </member>
+        <member name="T:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryResponseDto">
+            <summary>
+            DTO для отображения проводки
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryResponseDto.Id">
+            <summary>
+            Идентификатор проводки
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryResponseDto.Date">
+            <summary>
+            Дата списания времени
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryResponseDto.Hours">
+            <summary>
+            Количество часов
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryResponseDto.Description">
+            <summary>
+            Описание выполненной работы
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryResponseDto.TaskId">
+            <summary>
+            Идентификатор задачи
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryResponseDto.TaskName">
+            <summary>
+            Название задачи
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryResponseDto.ProjectName">
+            <summary>
+            Название проекта
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryResponseDto.CreatedAt">
+            <summary>
+            Дата создания
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryResponseDto.UpdatedAt">
+            <summary>
+            Дата последнего обновления
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryUpdateDto">
+            <summary>
+            DTO для обновления проводки
+            </summary>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryUpdateDto.Date">
+            <summary>
+            Дата списания времени
+            </summary>
+            <example>2026-07-08</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryUpdateDto.Hours">
+            <summary>
+            Количество часов
+            </summary>
+            <example>4.5</example>
+        </member>
+        <member name="P:WorkTimeTracker.API.DTOs.TimeEntry.TimeEntryUpdateDto.Description">
+            <summary>
+            Описание выполненной работы
+            </summary>
+            <example>Обновление API для учета времени</example>
+        </member>
+        <member name="T:WorkTimeTracker.API.Middleware.ExceptionHandlingMiddleware">
+            <summary>
+            Middleware для глобальной обработки исключений
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:WorkTimeTracker.API.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:WorkTimeTracker.API.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:WorkTimeTracker.API.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:WorkTimeTracker.API.Migrations.RenameTaskToWorkTask">
+            <inheritdoc />
+        </member>
+        <member name="M:WorkTimeTracker.API.Migrations.RenameTaskToWorkTask.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:WorkTimeTracker.API.Migrations.RenameTaskToWorkTask.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:WorkTimeTracker.API.Migrations.RenameTaskToWorkTask.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:WorkTimeTracker.API.Models.Project">
+            <summary>
+            Сущность "Проект" компании
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.Models.TimeEntry">
+            <summary>
+            Сущность "Проводка" - списание рабочего времени
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.Models.WorkTask">
+            <summary>
+            Сущность "Задача" в рамках проекта
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.Services.Interfaces.ITaskService">
+            <summary>
+            Интерфейс сервиса для работы с задачами
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Services.Interfaces.ITaskService.GetTaskByIdAsync(System.Guid)">
+            <summary>
+            Получить задачу по ID
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Services.Interfaces.ITaskService.IsTaskActiveAsync(System.Guid)">
+            <summary>
+            Проверить, активна ли задача
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Services.Interfaces.ITaskService.GetActiveTasksAsync">
+            <summary>
+            Получить все активные задачи
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Services.Interfaces.ITaskService.GetTasksByProjectAsync(System.Guid)">
+            <summary>
+            Получить задачи по проекту
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Services.Interfaces.ITaskService.HasTimeEntriesAsync(System.Guid)">
+            <summary>
+            Проверить, есть ли у задачи проводки
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.Services.Interfaces.ITimeEntryValidator">
+            <summary>
+            Интерфейс валидатора проводок рабочего времени
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Services.Interfaces.ITimeEntryValidator.ValidateDailyHoursLimitAsync(System.DateTime,System.Decimal,System.Nullable{System.Guid})">
+            <summary>
+            Проверить, не превышает ли общее количество часов за день 24
+            </summary>
+            <param name="date">Дата проверки</param>
+            <param name="newHours">Количество часов в новой проводке</param>
+            <param name="excludeEntryId">ID проводки, которую исключить из проверки (при обновлении)</param>
+            <returns>True, если валидация пройдена</returns>
+            <exception cref="T:System.InvalidOperationException">Если сумма часов превышает 24</exception>
+        </member>
+        <member name="M:WorkTimeTracker.API.Services.Interfaces.ITimeEntryValidator.GetDailyTotalHoursAsync(System.DateTime,System.Nullable{System.Guid})">
+            <summary>
+            Получить общую сумму часов за день
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Services.Interfaces.ITimeEntryValidator.ValidateTaskChangeAsync(System.Guid)">
+            <summary>
+            Проверить, можно ли сменить задачу у проводки (задача должна быть активна)
+            </summary>
+            <exception cref="T:System.InvalidOperationException">Если задача неактивна</exception>
+        </member>
+        <member name="T:WorkTimeTracker.API.Services.TaskService">
+            <summary>
+            Сервис для работы с задачами
+            </summary>
+        </member>
+        <member name="T:WorkTimeTracker.API.Services.TimeEntryValidator">
+            <summary>
+            Валидатор проводок рабочего времени
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Services.TimeEntryValidator.ValidateDailyHoursLimitAsync(System.DateTime,System.Decimal,System.Nullable{System.Guid})">
+            <summary>
+            Проверить лимит часов за день (не более 24)
+            </summary>
+            <summary>
+            Проверить лимит часов за день (не более 24)
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Services.TimeEntryValidator.GetDailyTotalHoursAsync(System.DateTime,System.Nullable{System.Guid})">
+            <summary>
+            Получить общую сумму часов за день
+            </summary>
+        </member>
+        <member name="M:WorkTimeTracker.API.Services.TimeEntryValidator.ValidateTaskChangeAsync(System.Guid)">
+            <summary>
+            Проверить, можно ли сменить задачу (задача должна быть активна)
+            </summary>
+        </member>
+        <member name="T:Program">
+            <summary>
+            Auto-generated public partial Program class for top-level statement apps.
+            </summary>
+        </member>
+    </members>
+</doc>
